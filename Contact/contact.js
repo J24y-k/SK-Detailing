@@ -306,11 +306,45 @@ function submitForm(data) {
     // Show loading state
     const submitBtn = contactForm.querySelector('.btn-submit');
     const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing WhatsApp...';
     submitBtn.disabled = true;
     
-    // Simulate API call
+    // Format the WhatsApp message
+    let message = `*🚗 New Booking Request - SK Detailing*%0A%0A`;
+    message += `*📋 Customer Details:*%0A`;
+    message += `Name: ${data.firstName} ${data.lastName}%0A`;
+    message += `Email: ${data.email}%0A`;
+    message += `Phone: ${data.phone}%0A%0A`;
+    
+    message += `*🔧 Service Details:*%0A`;
+    message += `Service: ${data.service}%0A`;
+    
+    if (data.addons && data.addons.length > 0) {
+        message += `Add-ons: ${data.addons.join(', ')}%0A`;
+    }
+    
+    message += `%0A*📅 Booking Information:*%0A`;
+    message += `Preferred Date: ${data.date}%0A`;
+    message += `Preferred Time: ${data.time}%0A`;
+    message += `Service Location: ${data.location}%0A`;
+    
+    if (data.vehicle) {
+        message += `%0A*🚙 Vehicle Details:*%0A`;
+        message += `${data.vehicle}%0A`;
+    }
+    
+    if (data.message) {
+        message += `%0A*💬 Additional Information:*%0A`;
+        message += `${data.message}%0A`;
+    }
+    
+    message += `%0A----%0A_Sent via SK Detailing Website_`;
+    
+    // Small delay for UX, then open WhatsApp
     setTimeout(() => {
+        // Open WhatsApp with pre-filled message
+        window.open(`https://wa.me/27832688029?text=${message}`, '_blank');
+        
         // Hide form and show success message
         gsap.to(contactForm, {
             duration: 0.5,
@@ -329,13 +363,10 @@ function submitForm(data) {
             }
         });
         
-        // Log form data (in production, send to server)
-        console.log('Form submitted:', data);
-        
         // Reset button
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-    }, 2000);
+    }, 1000);
 }
 
 // Reset form function
