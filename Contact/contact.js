@@ -340,19 +340,46 @@ function submitForm(data) {
     
     message += `%0A----%0A_Sent via SK Detailing Website_`;
     
+    // Detect if mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Use different URL format for mobile vs desktop
+    let whatsappURL;
+    if (isMobile) {
+        // Mobile: Use whatsapp:// protocol to open app directly
+        whatsappURL = `whatsapp://send?phone=27832688029&text=${message}`;
+    } else {
+        // Desktop: Use web.whatsapp.com
+        whatsappURL = `https://web.whatsapp.com/send?phone=27832688029&text=${message}`;
+    }
+    
     // Log the WhatsApp URL for debugging
-    const whatsappURL = `https://wa.me/27711532418?text=${message}`;
+    console.log('Device Type:', isMobile ? 'Mobile' : 'Desktop');
     console.log('Opening WhatsApp with URL:', whatsappURL);
     console.log('Form Data:', data);
     
     // Small delay for UX, then open WhatsApp
     setTimeout(() => {
-        // Open WhatsApp with pre-filled message
-        const whatsappWindow = window.open(whatsappURL, '_blank');
-        
-        // Check if popup was blocked
-        if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed == 'undefined') {
-            alert('Pop-up blocked! Please allow pop-ups for this site and try again, or click the WhatsApp link in the success message.');
+        // On mobile, use window.location for better app opening
+        if (isMobile) {
+            window.location.href = whatsappURL;
+            
+            // Fallback to wa.me if app doesn't open
+            setTimeout(() => {
+                const fallbackURL = `https://wa.me/27832688029?text=${message}`;
+                console.log('Trying fallback URL:', fallbackURL);
+                window.open(fallbackURL, '_blank');
+            }, 1500);
+        } else {
+            // Desktop: Open in new tab
+            const whatsappWindow = window.open(whatsappURL, '_blank');
+            
+            // Check if popup was blocked
+            if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed == 'undefined') {
+                alert('Pop-up blocked! Please allow pop-ups for this site and try again, or click the WhatsApp link in the success message.');
+                // Try alternative URL
+                window.open(`https://wa.me/27832688029?text=${message}`, '_blank');
+            }
         }
         
         // Hide form and show success message
@@ -363,6 +390,15 @@ function submitForm(data) {
             onComplete: () => {
                 contactForm.style.display = 'none';
                 successMessage.classList.add('active');
+                
+                // Update manual WhatsApp link with the message
+                const manualLink = document.getElementById('manualWhatsAppLink');
+                if (manualLink) {
+                    const manualURL = isMobile 
+                        ? `whatsapp://send?phone=27832688029&text=${message}`
+                        : `https://wa.me/27832688029?text=${message}`;
+                    manualLink.href = manualURL;
+                }
                 
                 gsap.from(successMessage, {
                     duration: 0.8,
