@@ -468,6 +468,7 @@ section {
 }
 
 /* ===== SUCCESS MESSAGE ===== */
+/* ===== SUCCESS MESSAGE ===== */
 .success-message {
     display: none;
     text-align: center;
@@ -503,9 +504,29 @@ section {
 
 .success-message p {
     color: var(--light-gray);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     line-height: 1.8;
 }
+
+.whatsapp-note {
+    background: var(--dark-gray);
+    padding: 15px 20px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-gold);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.whatsapp-link {
+    color: var(--primary-gold);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.whatsapp-link:hover {
+    color: var(--light-gold);
+}
+
 
 /* ===== CONTACT INFO SECTION ===== */
 .contact-info-section {

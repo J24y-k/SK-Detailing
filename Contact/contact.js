@@ -340,10 +340,20 @@ function submitForm(data) {
     
     message += `%0A----%0A_Sent via SK Detailing Website_`;
     
+    // Log the WhatsApp URL for debugging
+    const whatsappURL = `https://wa.me/27711532418?text=${message}`;
+    console.log('Opening WhatsApp with URL:', whatsappURL);
+    console.log('Form Data:', data);
+    
     // Small delay for UX, then open WhatsApp
     setTimeout(() => {
         // Open WhatsApp with pre-filled message
-        window.open(`https://wa.me/27832688029?text=${message}`, '_blank');
+        const whatsappWindow = window.open(whatsappURL, '_blank');
+        
+        // Check if popup was blocked
+        if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed == 'undefined') {
+            alert('Pop-up blocked! Please allow pop-ups for this site and try again, or click the WhatsApp link in the success message.');
+        }
         
         // Hide form and show success message
         gsap.to(contactForm, {
