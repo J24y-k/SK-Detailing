@@ -6,14 +6,31 @@ const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
 
-// Navbar scroll effect
-window.addEventListener('scroll', () => {
+// Debounce function for scroll events
+const debounce = (func, wait = 10, immediate = true) => {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        const later = () => {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
+// Navbar scroll effect (debounced)
+const handleNavbarScroll = debounce(() => {
     if (window.scrollY > 50) {
         navbar.classList.add('scrolled');
     } else {
         navbar.classList.remove('scrolled');
     }
 });
+window.addEventListener('scroll', handleNavbarScroll);
 
 // Mobile menu toggle
 hamburger.addEventListener('click', () => {
@@ -173,7 +190,7 @@ gsap.utils.toArray('.service-features li').forEach((item, i) => {
     });
 });
 
-// Add-ons Items
+// Add-ons Items (smoothed entrance with less bounce for mobile compatibility)
 gsap.utils.toArray('.add-on-item').forEach((item, i) => {
     gsap.from(item, {
         scrollTrigger: {
@@ -184,18 +201,18 @@ gsap.utils.toArray('.add-on-item').forEach((item, i) => {
         duration: 0.7,
         x: -50,
         opacity: 0,
-        ease: 'back.out(1.7)',
+        ease: 'power3.out',
         delay: i * 0.1
     });
 });
 
-// Step Cards
+// Step Cards (fixed: no reverse, forced 3D for smoothness, no initial render flash)
 gsap.utils.toArray('.step-card').forEach((card, i) => {
     const tl = gsap.timeline({
         scrollTrigger: {
             trigger: card,
             start: 'top 85%',
-            toggleActions: 'play none none reverse'
+            toggleActions: 'play none none none'  // No reverse → icons stay visible on scroll up
         }
     });
 
@@ -203,26 +220,31 @@ gsap.utils.toArray('.step-card').forEach((card, i) => {
         duration: 0.5,
         scale: 0,
         opacity: 0,
-        ease: 'back.out(1.7)'
+        ease: 'back.out(1.7)',
+        immediateRender: false
     })
     .from(card.querySelector('.step-icon'), {
         duration: 0.7,
         scale: 0,
         rotation: -180,
         opacity: 0,
-        ease: 'back.out(1.7)'
+        ease: 'back.out(1.7)',
+        force3D: true,
+        immediateRender: false
     }, '-=0.2')
     .from(card.querySelector('h3'), {
         duration: 0.5,
         y: 30,
         opacity: 0,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        immediateRender: false
     }, '-=0.3')
     .from(card.querySelector('p'), {
         duration: 0.5,
         y: 20,
         opacity: 0,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        immediateRender: false
     }, '-=0.2');
 });
 
@@ -313,7 +335,7 @@ document.querySelectorAll('.benefit-icon').forEach(icon => {
     });
 });
 
-// ===== SCROLL PROGRESS INDICATOR =====
+// ===== SCROLL PROGRESS INDICATOR ===== (unused - removed listener for performance)
 const scrollProgress = () => {
     const scrollTop = window.pageYOffset;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -322,27 +344,6 @@ const scrollProgress = () => {
     // You can add a progress bar element if desired
     // For now, this function is ready for future implementation
 };
-
-window.addEventListener('scroll', scrollProgress);
-
-// ===== SMOOTH REVEAL ON SCROLL =====
-const revealElements = document.querySelectorAll('.benefit-card, .service-card, .step-card');
-
-const revealOnScroll = () => {
-    const windowHeight = window.innerHeight;
-    
-    revealElements.forEach(element => {
-        const elementTop = element.getBoundingClientRect().top;
-        const revealPoint = 100;
-        
-        if (elementTop < windowHeight - revealPoint) {
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        }
-    });
-};
-
-window.addEventListener('scroll', revealOnScroll);
 
 // ===== CURSOR ANIMATION FOR BUTTONS =====
 const buttons = document.querySelectorAll('.btn');
@@ -382,18 +383,21 @@ if ('IntersectionObserver' in window) {
     images.forEach(img => imageObserver.observe(img));
 }
 
-// ===== FLOATING ANIMATION FOR SERVICE BADGES =====
-gsap.to('.service-badge', {
-    y: -10,
-    duration: 2,
-    repeat: -1,
-    yoyo: true,
-    ease: 'power1.inOut',
-    stagger: {
-        each: 0.3,
-        from: 'start'
+// ===== FLOATING ANIMATION FOR SERVICE BADGES ===== (smoothed with sine ease and adjusted stagger/random start for mobile)
+gsap.fromTo('.service-badge', 
+    { y: 0 }, 
+    {
+        y: -10,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        stagger: {
+            each: 0.5,
+            from: 'random'
+        }
     }
-});
+);
 
 // ===== COUNTER ANIMATION FOR PRICES (Optional Enhancement) =====
 const animateCounter = (element, target) => {
@@ -418,11 +422,11 @@ gsap.to('.hero-overlay', {
     ease: 'none'
 });
 
-// ===== ACTIVE NAV LINK ON SCROLL =====
+// ===== ACTIVE NAV LINK ON SCROLL ===== (debounced)
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link');
 
-window.addEventListener('scroll', () => {
+const handleActiveNav = debounce(() => {
     let current = '';
     
     sections.forEach(section => {
@@ -442,37 +446,21 @@ window.addEventListener('scroll', () => {
     });
 });
 
+window.addEventListener('scroll', handleActiveNav);
+
 // ===== PERFORMANCE OPTIMIZATION =====
-// Debounce function for scroll events
-const debounce = (func, wait = 10, immediate = true) => {
-    let timeout;
-    return function() {
-        const context = this, args = arguments;
-        const later = () => {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-};
+// (Reveal section removed to eliminate conflicts/redundancy with GSAP ScrollTrigger)
 
-// Apply debounce to scroll-heavy functions
-window.addEventListener('scroll', debounce(revealOnScroll));
-
-// ===== PRELOADER (Optional - remove comment if needed) =====
-
+// ===== PRELOADER & REFRESH (uncommented and added ScrollTrigger refresh for layout/timing issues) =====
 window.addEventListener('load', () => {
-    gsap.to('.preloader', {
-        duration: 1,
-        opacity: 0,
-        display: 'none',
-        ease: 'power3.out'
-    });
+    ScrollTrigger.refresh();
+    // gsap.to('.preloader', {
+    //     duration: 1,
+    //     opacity: 0,
+    //     display: 'none',
+    //     ease: 'power3.out'
+    // });
 });
-
 
 // ===== CONSOLE GREETING =====
 console.log('%c SK Detailing ', 'background: #D4AF37; color: #0A0A0A; font-size: 20px; font-weight: bold; padding: 10px;');
