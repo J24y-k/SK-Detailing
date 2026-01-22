@@ -1,13 +1,20 @@
 // ===== GSAP REGISTRATION =====
 gsap.registerPlugin(ScrollTrigger);
 
+// Global ScrollTrigger config for mobile smoothness (throttle callbacks, handle fast flings)
+ScrollTrigger.config({ 
+    limitCallbacks: 1,  // Max 1 callback per frame → less jank
+    fastScrollEnd: 200  // Ignores scrolls <200ms (flings) for stability
+});
+
+
 // ===== NAVIGATION =====
 const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
 
 // Debounce function for scroll events
-const debounce = (func, wait = 10, immediate = true) => {
+const debounce = (func, wait = 16, immediate = true) => {  // 16ms ≈ 60fps by default {
     let timeout;
     return function() {
         const context = this, args = arguments;
@@ -125,14 +132,136 @@ gsap.from('.nav-menu li', {
     delay: 0.4
 });
 
-// ===== SCROLL TRIGGER ANIMATIONS =====
+// ===== SCROLL TRIGGER ANIMATIONS (MOBILE-RESPONSIVE) =====
+let mm = gsap.matchMedia();  // GSAP's responsive powerhouse
 
-// Section Headers
-gsap.utils.toArray('.section-header').forEach(header => {
-    gsap.from(header, {
+mm.add("(min-width: 769px)", () => {  // Desktop: Full animations with reverse
+    // Section Headers
+    gsap.utils.toArray('.section-header').forEach(header => {
+        gsap.from(header, {
+            scrollTrigger: {
+                trigger: header,
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            ease: 'power3.out'
+        });
+    });
+
+    // Benefit Cards
+    gsap.utils.toArray('.benefit-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 0.8,
+            y: 80,
+            opacity: 0,
+            ease: 'power3.out',
+            delay: i * 0.1
+        });
+    });
+
+    // Service Cards
+    gsap.utils.toArray('.service-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 1,
+            y: 100,
+            opacity: 0,
+            ease: 'power3.out',
+            delay: i * 0.2
+        });
+    });
+
+    // Service Features List Items
+    gsap.utils.toArray('.service-features li').forEach((item, i) => {
+        gsap.from(item, {
+            scrollTrigger: {
+                trigger: item,
+                start: 'top 90%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 0.6,
+            x: -30,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: i * 0.05
+        });
+    });
+
+    // Add-ons Items
+    gsap.utils.toArray('.add-on-item').forEach((item, i) => {
+        gsap.from(item, {
+            scrollTrigger: {
+                trigger: item,
+                start: 'top 90%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 0.7,
+            x: -50,
+            opacity: 0,
+            ease: 'power3.out',
+            delay: i * 0.1
+        });
+    });
+
+    // Step Cards (with reverse for desktop)
+    gsap.utils.toArray('.step-card').forEach((card, i) => {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'  // Reverse OK on desktop
+            }
+        });
+
+        tl.from(card.querySelector('.step-number'), {
+            duration: 0.5,
+            scale: 0,
+            opacity: 0,
+            ease: 'back.out(1.7)',
+            immediateRender: false
+        })
+        .from(card.querySelector('.step-icon'), {
+            duration: 0.7,
+            scale: 0,
+            rotation: -180,
+            opacity: 0,
+            ease: 'back.out(1.7)',
+            force3D: true,
+            immediateRender: false
+        }, '-=0.2')
+        .from(card.querySelector('h3'), {
+            duration: 0.5,
+            y: 30,
+            opacity: 0,
+            ease: 'power3.out',
+            immediateRender: false
+        }, '-=0.3')
+        .from(card.querySelector('p'), {
+            duration: 0.5,
+            y: 20,
+            opacity: 0,
+            ease: 'power3.out',
+            immediateRender: false
+        }, '-=0.2');
+    });
+
+    // CTA Section
+    gsap.from('.cta-content h2', {
         scrollTrigger: {
-            trigger: header,
-            start: 'top 80%',
+            trigger: '.cta-section',
+            start: 'top 70%',
             toggleActions: 'play none none reverse'
         },
         duration: 1,
@@ -140,168 +269,227 @@ gsap.utils.toArray('.section-header').forEach(header => {
         opacity: 0,
         ease: 'power3.out'
     });
-});
 
-// Benefit Cards
-gsap.utils.toArray('.benefit-card').forEach((card, i) => {
-    gsap.from(card, {
+    gsap.from('.cta-content p', {
         scrollTrigger: {
-            trigger: card,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.8,
-        y: 80,
-        opacity: 0,
-        ease: 'power3.out',
-        delay: i * 0.1
-    });
-});
-
-// Service Cards
-gsap.utils.toArray('.service-card').forEach((card, i) => {
-    gsap.from(card, {
-        scrollTrigger: {
-            trigger: card,
-            start: 'top 85%',
+            trigger: '.cta-section',
+            start: 'top 70%',
             toggleActions: 'play none none reverse'
         },
         duration: 1,
-        y: 100,
-        opacity: 0,
-        ease: 'power3.out',
-        delay: i * 0.2
-    });
-});
-
-// Service Features List Items
-gsap.utils.toArray('.service-features li').forEach((item, i) => {
-    gsap.from(item, {
-        scrollTrigger: {
-            trigger: item,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.6,
-        x: -30,
-        opacity: 0,
-        ease: 'power2.out',
-        delay: i * 0.05
-    });
-});
-
-// Add-ons Items (smoothed entrance with less bounce for mobile compatibility)
-gsap.utils.toArray('.add-on-item').forEach((item, i) => {
-    gsap.from(item, {
-        scrollTrigger: {
-            trigger: item,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.7,
-        x: -50,
-        opacity: 0,
-        ease: 'power3.out',
-        delay: i * 0.1
-    });
-});
-
-// Step Cards (fixed: no reverse, forced 3D for smoothness, no initial render flash)
-gsap.utils.toArray('.step-card').forEach((card, i) => {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: card,
-            start: 'top 85%',
-            toggleActions: 'play none none none'  // No reverse → icons stay visible on scroll up
-        }
-    });
-
-    tl.from(card.querySelector('.step-number'), {
-        duration: 0.5,
-        scale: 0,
-        opacity: 0,
-        ease: 'back.out(1.7)',
-        immediateRender: false
-    })
-    .from(card.querySelector('.step-icon'), {
-        duration: 0.7,
-        scale: 0,
-        rotation: -180,
-        opacity: 0,
-        ease: 'back.out(1.7)',
-        force3D: true,
-        immediateRender: false
-    }, '-=0.2')
-    .from(card.querySelector('h3'), {
-        duration: 0.5,
         y: 30,
         opacity: 0,
         ease: 'power3.out',
-        immediateRender: false
-    }, '-=0.3')
-    .from(card.querySelector('p'), {
-        duration: 0.5,
+        delay: 0.2
+    });
+
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 70%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'back.out(1.7)',
+        delay: 0.4
+    });
+
+    // Footer Animation
+    gsap.from('.footer-col', {
+        scrollTrigger: {
+            trigger: '.footer',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.8,
+        y: 50,
+        opacity: 0,
+        stagger: 0.15,
+        ease: 'power3.out'
+    });
+});
+
+mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touch smoothness
+    // Section Headers (no reverse)
+    gsap.utils.toArray('.section-header').forEach(header => {
+        gsap.from(header, {
+            scrollTrigger: {
+                trigger: header,
+                start: 'top 80%',
+                toggleActions: 'play none none none'  // No reverse = no shaky rewind
+            },
+            duration: 0.8,  // Slightly faster for mobile
+            y: 30,
+            opacity: 0,
+            ease: 'power2.out'  // Lighter ease
+        });
+    });
+
+    // Benefit Cards (no reverse)
+    gsap.utils.toArray('.benefit-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none none'
+            },
+            duration: 0.6,
+            y: 50,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: i * 0.05  // Tighter stagger
+        });
+    });
+
+    // Service Cards (no reverse)
+    gsap.utils.toArray('.service-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none none'
+            },
+            duration: 0.8,
+            y: 60,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: i * 0.1
+        });
+    });
+
+    // Service Features List Items (no reverse)
+    gsap.utils.toArray('.service-features li').forEach((item, i) => {
+        gsap.from(item, {
+            scrollTrigger: {
+                trigger: item,
+                start: 'top 90%',
+                toggleActions: 'play none none none'
+            },
+            duration: 0.4,
+            x: -20,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: i * 0.03
+        });
+    });
+
+    // Add-ons Items (no reverse)
+    gsap.utils.toArray('.add-on-item').forEach((item, i) => {
+        gsap.from(item, {
+            scrollTrigger: {
+                trigger: item,
+                start: 'top 90%',
+                toggleActions: 'play none none none'
+            },
+            duration: 0.5,
+            x: -30,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: i * 0.05
+        });
+    });
+
+    // Step Cards (no reverse, simplified icon pop—no rotation for perf)
+    gsap.utils.toArray('.step-card').forEach((card, i) => {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        tl.from(card.querySelector('.step-number'), {
+            duration: 0.4,
+            scale: 0,
+            opacity: 0,
+            ease: 'power2.out',
+            immediateRender: false
+        })
+        .from(card.querySelector('.step-icon'), {
+            duration: 0.5,
+            scale: 0,
+            opacity: 0,  // No rotation on mobile (saves calc)
+            ease: 'power2.out',
+            force3D: true,
+            immediateRender: false
+        }, '-=0.1')
+        .from(card.querySelector('h3'), {
+            duration: 0.4,
+            y: 20,
+            opacity: 0,
+            ease: 'power2.out',
+            immediateRender: false
+        }, '-=0.2')
+        .from(card.querySelector('p'), {
+            duration: 0.4,
+            y: 15,
+            opacity: 0,
+            ease: 'power2.out',
+            immediateRender: false
+        }, '-=0.1');
+    });
+
+    // CTA Section (no reverse)
+    gsap.from('.cta-content h2', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 70%',
+            toggleActions: 'play none none none'
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out'
+    });
+
+    gsap.from('.cta-content p', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 70%',
+            toggleActions: 'play none none none'
+        },
+        duration: 0.8,
         y: 20,
         opacity: 0,
-        ease: 'power3.out',
-        immediateRender: false
-    }, '-=0.2');
+        ease: 'power2.out',
+        delay: 0.1
+    });
+
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 70%',
+        toggleActions: 'play none none none'
+        },
+        duration: 0.6,
+        y: 20,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power2.out',
+        delay: 0.2
+    });
+
+    // Footer Animation (no reverse)
+    gsap.from('.footer-col', {
+        scrollTrigger: {
+            trigger: '.footer',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+        },
+        duration: 0.6,
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power2.out'
+    });
 });
 
-// CTA Section
-gsap.from('.cta-content h2', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 50,
-    opacity: 0,
-    ease: 'power3.out'
-});
-
-gsap.from('.cta-content p', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 30,
-    opacity: 0,
-    ease: 'power3.out',
-    delay: 0.2
-});
-
-gsap.from('.cta-buttons .btn', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 30,
-    opacity: 0,
-    stagger: 0.2,
-    ease: 'back.out(1.7)',
-    delay: 0.4
-});
-
-// Footer Animation
-gsap.from('.footer-col', {
-    scrollTrigger: {
-        trigger: '.footer',
-        start: 'top 80%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 50,
-    opacity: 0,
-    stagger: 0.15,
-    ease: 'power3.out'
-});
-
+// Re-apply on resize/orientation change
+mm.add("(orientation: portrait)", () => { /* Mobile portrait tweaks if needed */ });
 // ===== PARALLAX EFFECTS =====
 gsap.to('.hero::before', {
     scrollTrigger: {
