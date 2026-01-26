@@ -1,10 +1,32 @@
 // ===== GSAP REGISTRATION =====
 gsap.registerPlugin(ScrollTrigger);
 
+// Global ScrollTrigger config for smoothness
+ScrollTrigger.config({ 
+    limitCallbacks: 1,
+    fastScrollEnd: 200
+});
+
 // ===== NAVIGATION =====
 const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
+
+// Debounce function for scroll events
+const debounce = (func, wait = 16, immediate = true) => {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        const later = () => {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
 
 // Mobile menu toggle
 hamburger.addEventListener('click', () => {
@@ -271,18 +293,43 @@ if (document.querySelector('.popular-banner')) {
     });
 }
 
-// ===== ADD-ONS ANIMATIONS =====
-gsap.from('.addon-card', {
-    scrollTrigger: {
-        trigger: '.add-ons-section',
-        start: 'top 75%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 80,
-    opacity: 0,
-    stagger: 0.15,
-    ease: 'power3.out'
+// ===== ADD-ONS ANIMATIONS (RESPONSIVE, PER-CARD) =====
+let mmAddons = gsap.matchMedia();
+
+mmAddons.add("(min-width: 769px)", () => {  // Desktop
+    gsap.utils.toArray('.addon-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 0.8,
+            y: 80,
+            opacity: 0,
+            ease: 'power3.out',
+            delay: i * 0.15
+        });
+    });
+});
+
+mmAddons.add("(max-width: 768px)", () => {  // Mobile
+    gsap.utils.toArray('.addon-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+                once: true
+            },
+            duration: 0.6,
+            y: 50,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: i * 0.1,
+            immediateRender: false
+        });
+    });
 });
 
 // Addon Icons Hover Effect
@@ -292,7 +339,8 @@ document.querySelectorAll('.addon-icon').forEach(icon => {
             duration: 0.4,
             scale: 1.15,
             rotation: 360,
-            ease: 'back.out(1.7)'
+            ease: 'back.out(1.7)',
+            force3D: true
         });
     });
 
@@ -301,6 +349,25 @@ document.querySelectorAll('.addon-icon').forEach(icon => {
             duration: 0.4,
             scale: 1,
             rotation: 0,
+            ease: 'power2.out'
+        });
+    });
+});
+
+// ===== ADDON CARD HOVER PULSE =====
+document.querySelectorAll('.addon-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        gsap.to(card.querySelector('.addon-price'), {
+            duration: 0.5,
+            scale: 1.1,
+            ease: 'elastic.out(1, 0.5)'
+        });
+    });
+
+    card.addEventListener('mouseleave', () => {
+        gsap.to(card.querySelector('.addon-price'), {
+            duration: 0.3,
+            scale: 1,
             ease: 'power2.out'
         });
     });
@@ -370,47 +437,105 @@ gsap.utils.toArray('.process-step').forEach((step, i) => {
     }, '-=0.2');
 });
 
-// ===== CTA SECTION =====
-gsap.from('.cta-content h2', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 50,
-    opacity: 0,
-    ease: 'power3.out'
+// ===== CTA SECTION (RESPONSIVE) =====
+// TODO: change phone numbers in HTML for CTA buttons back to friend's number (e.g., tel:0711532418 and wa.me/27711532418) once testing is done
+let mmService = gsap.matchMedia();
+
+mmService.add("(min-width: 769px)", () => {
+    // Ensure buttons are visible by default
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
+    gsap.from('.cta-content h2', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 50,
+        opacity: 0,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.cta-content p', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 30,
+        opacity: 0,
+        ease: 'power3.out',
+        delay: 0.2
+    });
+
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+            onEnter: () => console.log('Desktop CTA Buttons Fired!')
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'back.out(1.7)',
+        delay: 0.4
+    });
 });
 
-gsap.from('.cta-content p', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 30,
-    opacity: 0,
-    ease: 'power3.out',
-    delay: 0.2
-});
+mmService.add("(max-width: 768px)", () => {
+    // Ensure buttons are visible by default
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
+    gsap.from('.cta-content h2', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out'
+    });
 
-gsap.from('.cta-buttons .btn', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 30,
-    opacity: 0,
-    stagger: 0.2,
-    ease: 'back.out(1.7)',
-    delay: 0.4
+    gsap.from('.cta-content p', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true
+        },
+        duration: 0.8,
+        y: 20,
+        opacity: 0,
+        ease: 'power2.out',
+        delay: 0.1
+    });
+
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true,
+            onEnter: () => console.log('Mobile CTA Buttons Fired!')
+        },
+        duration: 0.6,
+        y: 20,
+        opacity: 0,
+        stagger: 0.15,
+        ease: 'power2.out',
+        delay: 0.2
+    });
 });
 
 // ===== FOOTER ANIMATION =====
+// TODO: Jeremiah - Check footer HTML for any phone numbers (e.g., 0711532418 in contact links) and change back to friend's number once testing done
 gsap.from('.footer-col', {
     scrollTrigger: {
         trigger: '.footer',
@@ -476,25 +601,6 @@ document.querySelectorAll('.package-detailed').forEach(pkg => {
     });
 });
 
-// ===== ADDON CARD HOVER PULSE =====
-document.querySelectorAll('.addon-card').forEach(card => {
-    card.addEventListener('mouseenter', () => {
-        gsap.to(card.querySelector('.addon-price'), {
-            duration: 0.5,
-            scale: 1.1,
-            ease: 'elastic.out(1, 0.5)'
-        });
-    });
-
-    card.addEventListener('mouseleave', () => {
-        gsap.to(card.querySelector('.addon-price'), {
-            duration: 0.3,
-            scale: 1,
-            ease: 'power2.out'
-        });
-    });
-});
-
 // ===== FLOATING ANIMATION FOR BADGES =====
 gsap.to('.premium-badge', {
     y: -5,
@@ -538,7 +644,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
         
-        // Don't prevent default for empty anchors
         if (href === '#' || href === '') return;
         
         e.preventDefault();
@@ -556,7 +661,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 ease: 'power3.inOut'
             });
             
-            // Close mobile menu if open
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
         }
@@ -615,22 +719,6 @@ document.querySelectorAll('.comparison-table tbody tr').forEach(row => {
     });
 });
 
-// ===== SECTION REVEAL ON SCROLL =====
-const sections = document.querySelectorAll('section');
-
-sections.forEach(section => {
-    gsap.from(section, {
-        scrollTrigger: {
-            trigger: section,
-            start: 'top 95%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.6,
-        opacity: 0,
-        ease: 'power2.out'
-    });
-});
-
 // ===== LAZY LOADING FOR IMAGES =====
 if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -646,24 +734,12 @@ if ('IntersectionObserver' in window) {
 
     const images = document.querySelectorAll('img[data-src]');
     images.forEach(img => imageObserver.observe(img));
-}
+}  // ← Just a closing brace, no parenthesis
 
-// ===== PERFORMANCE OPTIMIZATION =====
-// Debounce function for scroll events
-const debounce = (func, wait = 10, immediate = true) => {
-    let timeout;
-    return function() {
-        const context = this, args = arguments;
-        const later = () => {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-};
+// ===== PRELOADER & REFRESH =====
+window.addEventListener('load', () => {
+    ScrollTrigger.refresh();
+});
 
 // ===== CONSOLE GREETING =====
 console.log('%c SK Detailing - Services ', 'background: #D4AF37; color: #0A0A0A; font-size: 20px; font-weight: bold; padding: 10px;');

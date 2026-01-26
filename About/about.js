@@ -1,10 +1,32 @@
 // ===== GSAP REGISTRATION =====
 gsap.registerPlugin(ScrollTrigger);
 
+// Global ScrollTrigger config for smoothness
+ScrollTrigger.config({ 
+    limitCallbacks: 1,
+    fastScrollEnd: 200
+});
+
 // ===== NAVIGATION =====
 const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
+
+// Debounce function for scroll events
+const debounce = (func, wait = 16, immediate = true) => {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        const later = () => {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
 
 // Mobile menu toggle
 hamburger.addEventListener('click', () => {
@@ -133,60 +155,129 @@ gsap.from('.image-badge', {
     delay: 0.5
 });
 
-// ===== MISSION & VISION ANIMATIONS =====
-gsap.from('.mv-card', {
-    scrollTrigger: {
-        trigger: '.mission-vision',
-        start: 'top 75%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 100,
-    opacity: 0,
-    stagger: 0.3,
-    ease: 'power3.out'
+// ===== MISSION & VISION ANIMATIONS (RESPONSIVE) =====
+let mmMission = gsap.matchMedia();
+
+mmMission.add("(min-width: 769px)", () => {  // Desktop: With reverse
+    gsap.from('.mv-card', {
+        scrollTrigger: {
+            trigger: '.mission-vision',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 100,
+        opacity: 0,
+        stagger: 0.3,
+        ease: 'power3.out'
+    });
 });
 
-// ===== CORE VALUES ANIMATIONS =====
-gsap.utils.toArray('.value-card').forEach((card, i) => {
-    const tl = gsap.timeline({
+mmMission.add("(max-width: 768px)", () => {  // Mobile: Once-only, no reverse
+    gsap.from('.mv-card', {
         scrollTrigger: {
-            trigger: card,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse'
-        }
-    });
-
-    tl.from(card, {
+            trigger: '.mission-vision',
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+            once: true
+        },
         duration: 0.8,
-        y: 80,
+        y: 60,
         opacity: 0,
-        ease: 'power3.out'
-    })
-    .from(card.querySelector('.value-number'), {
-        duration: 0.5,
-        scale: 0,
-        opacity: 0,
-        ease: 'back.out(1.7)'
-    }, '-=0.5')
-    .from(card.querySelector('.value-icon'), {
-        duration: 0.6,
-        scale: 0,
-        rotation: -180,
-        ease: 'back.out(1.7)'
-    }, '-=0.4')
-    .from(card.querySelector('h3'), {
-        duration: 0.5,
-        y: 20,
-        opacity: 0,
-        ease: 'power3.out'
-    }, '-=0.3')
-    .from(card.querySelector('p'), {
-        duration: 0.5,
-        y: 15,
-        opacity: 0,
-        ease: 'power3.out'
-    }, '-=0.2');
+        stagger: 0.2,
+        ease: 'power2.out',
+        immediateRender: false
+    });
+});
+
+// ===== CORE VALUES ANIMATIONS (RESPONSIVE) =====
+let mmValues = gsap.matchMedia();
+
+mmValues.add("(min-width: 769px)", () => {  // Desktop: Full timeline with reverse
+    gsap.utils.toArray('.value-card').forEach((card, i) => {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            }
+        });
+
+        tl.from(card, {
+            duration: 0.8,
+            y: 80,
+            opacity: 0,
+            ease: 'power3.out'
+        })
+        .from(card.querySelector('.value-number'), {
+            duration: 0.5,
+            scale: 0,
+            opacity: 0,
+            ease: 'back.out(1.7)'
+        }, '-=0.5')
+        .from(card.querySelector('.value-icon'), {
+            duration: 0.6,
+            scale: 0,
+            rotation: -180,
+            ease: 'back.out(1.7)'
+        }, '-=0.4')
+        .from(card.querySelector('h3'), {
+            duration: 0.5,
+            y: 20,
+            opacity: 0,
+            ease: 'power3.out'
+        }, '-=0.3')
+        .from(card.querySelector('p'), {
+            duration: 0.5,
+            y: 15,
+            opacity: 0,
+            ease: 'power3.out'
+        }, '-=0.2');
+    });
+});
+
+mmValues.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse
+    gsap.utils.toArray('.value-card').forEach((card, i) => {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+                once: true
+            }
+        });
+
+        tl.from(card, {
+            duration: 0.6,
+            y: 50,
+            opacity: 0,
+            ease: 'power2.out'
+        })
+        .from(card.querySelector('.value-number'), {
+            duration: 0.4,
+            scale: 0,
+            opacity: 0,
+            ease: 'power2.out'
+        }, '-=0.4')
+        .from(card.querySelector('.value-icon'), {
+            duration: 0.5,
+            scale: 0,
+            opacity: 0,
+            ease: 'power2.out'  // No rotation for mobile perf
+        }, '-=0.3')
+        .from(card.querySelector('h3'), {
+            duration: 0.4,
+            y: 15,
+            opacity: 0,
+            ease: 'power2.out'
+        }, '-=0.2')
+        .from(card.querySelector('p'), {
+            duration: 0.4,
+            y: 10,
+            opacity: 0,
+            ease: 'power2.out'
+        }, '-=0.1');
+    });
 });
 
 // ===== WHY CHOOSE US ANIMATIONS =====
@@ -305,125 +396,155 @@ gsap.from('.stat-item', {
 });
 
 // ===== TEAM SECTION ANIMATIONS =====
-gsap.from('.team-member-card', {
-    scrollTrigger: {
-        trigger: '.meet-team',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1.2,
-    y: 100,
-    opacity: 0,
-    ease: 'power3.out'
+// (Commented out in HTML, so no changes needed - but ready if uncommented)
+// gsap.from('.team-member-card', {
+//     scrollTrigger: {
+//         trigger: '.meet-team',
+//         start: 'top 70%',
+//         toggleActions: 'play none none reverse'
+//     },
+//     duration: 1.2,
+//     y: 100,
+//     opacity: 0,
+//     ease: 'power3.out'
+// });
+
+// ... (rest of team anims if needed)
+
+// ===== TESTIMONIALS ANIMATIONS (RESPONSIVE) =====
+let mmTestimonials = gsap.matchMedia();
+
+mmTestimonials.add("(min-width: 769px)", () => {  // Desktop: With reverse
+    gsap.from('.testimonial-card', {
+        scrollTrigger: {
+            trigger: '.testimonials',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.8,
+        y: 80,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'power3.out'
+    });
 });
 
-gsap.from('.member-info h3', {
-    scrollTrigger: {
-        trigger: '.member-info',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    x: -30,
-    opacity: 0,
-    ease: 'power3.out'
+mmTestimonials.add("(max-width: 768px)", () => {  // Mobile: Once-only, no reverse
+    gsap.from('.testimonial-card', {
+        scrollTrigger: {
+            trigger: '.testimonials',
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+            once: true
+        },
+        duration: 0.6,
+        y: 50,
+        opacity: 0,
+        stagger: 0.15,
+        ease: 'power2.out',
+        immediateRender: false
+    });
 });
 
-gsap.from('.member-role', {
-    scrollTrigger: {
-        trigger: '.member-info',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    x: -30,
-    opacity: 0,
-    ease: 'power3.out',
-    delay: 0.2
+// ===== CTA SECTION (RESPONSIVE) =====
+// TODO: Jeremiah - Remember to change phone numbers in HTML for CTA buttons back to friend's number (e.g., tel:0711532418 and wa.me/27711532418) once testing is done
+let mmAboutCTA = gsap.matchMedia();
+
+mmAboutCTA.add("(min-width: 769px)", () => {
+    // Ensure buttons are visible by default
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
+    gsap.from('.cta-content h2', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 50,
+        opacity: 0,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.cta-content p', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 30,
+        opacity: 0,
+        ease: 'power3.out',
+        delay: 0.2
+    });
+
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+            onEnter: () => console.log('Desktop CTA Buttons Fired!')
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'back.out(1.7)',
+        delay: 0.4
+    });
 });
 
-gsap.from('.member-bio', {
-    scrollTrigger: {
-        trigger: '.member-info',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 20,
-    opacity: 0,
-    ease: 'power3.out',
-    delay: 0.4
-});
+mmAboutCTA.add("(max-width: 768px)", () => {
+    // Ensure buttons are visible by default
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
+    gsap.from('.cta-content h2', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out'
+    });
 
-gsap.from('.expertise-tag', {
-    scrollTrigger: {
-        trigger: '.member-expertise',
-        start: 'top 90%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.6,
-    scale: 0,
-    opacity: 0,
-    stagger: 0.1,
-    ease: 'back.out(1.7)',
-    delay: 0.6
-});
+    gsap.from('.cta-content p', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true
+        },
+        duration: 0.8,
+        y: 20,
+        opacity: 0,
+        ease: 'power2.out',
+        delay: 0.1
+    });
 
-// ===== TESTIMONIALS ANIMATIONS =====
-gsap.from('.testimonial-card', {
-    scrollTrigger: {
-        trigger: '.testimonials',
-        start: 'top 75%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 80,
-    opacity: 0,
-    stagger: 0.2,
-    ease: 'power3.out'
-});
-
-// ===== CTA SECTION =====
-gsap.from('.cta-content h2', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 50,
-    opacity: 0,
-    ease: 'power3.out'
-});
-
-gsap.from('.cta-content p', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 1,
-    y: 30,
-    opacity: 0,
-    ease: 'power3.out',
-    delay: 0.2
-});
-
-gsap.from('.cta-buttons .btn', {
-    scrollTrigger: {
-        trigger: '.cta-section',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse'
-    },
-    duration: 0.8,
-    y: 30,
-    opacity: 0,
-    stagger: 0.2,
-    ease: 'back.out(1.7)',
-    delay: 0.4
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true,
+            onEnter: () => console.log('Mobile CTA Buttons Fired!')
+        },
+        duration: 0.6,
+        y: 20,
+        opacity: 0,
+        stagger: 0.15,
+        ease: 'power2.out',
+        delay: 0.2
+    });
 });
 
 // ===== FOOTER ANIMATION =====
+// TODO: Jeremiah - Check footer HTML for any phone numbers (e.g., 0711532418 in contact links) and change back to friend's number once testing done
 gsap.from('.footer-col', {
     scrollTrigger: {
         trigger: '.footer',
@@ -569,22 +690,6 @@ gsap.to('.experience-badge', {
     ease: 'power1.inOut'
 });
 
-// ===== SECTION REVEAL ON SCROLL =====
-const sections = document.querySelectorAll('section');
-
-sections.forEach(section => {
-    gsap.from(section, {
-        scrollTrigger: {
-            trigger: section,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.6,
-        opacity: 0,
-        ease: 'power2.out'
-    });
-});
-
 // ===== SMOOTH SCROLL TO SECTIONS =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -604,23 +709,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// ===== PERFORMANCE OPTIMIZATION =====
-// Debounce function for scroll events
-const debounce = (func, wait = 10, immediate = true) => {
-    let timeout;
-    return function() {
-        const context = this, args = arguments;
-        const later = () => {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-};
-
 // ===== LAZY LOADING FOR IMAGES =====
 if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -636,7 +724,13 @@ if ('IntersectionObserver' in window) {
 
     const images = document.querySelectorAll('img[data-src]');
     images.forEach(img => imageObserver.observe(img));
-}
+}  // ← Just a closing brace, no parenthesis
+
+
+// ===== PRELOADER & REFRESH =====
+window.addEventListener('load', () => {
+    ScrollTrigger.refresh();
+});
 
 // ===== CONSOLE GREETING =====
 console.log('%c SK Detailing - About Us ', 'background: #D4AF37; color: #0A0A0A; font-size: 20px; font-weight: bold; padding: 10px;');

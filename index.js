@@ -256,60 +256,6 @@ mm.add("(min-width: 769px)", () => {  // Desktop: Full animations with reverse
             immediateRender: false
         }, '-=0.2');
     });
-
-    // CTA Section
-    gsap.from('.cta-content h2', {
-        scrollTrigger: {
-            trigger: '.cta-section',
-            start: 'top 70%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 1,
-        y: 50,
-        opacity: 0,
-        ease: 'power3.out'
-    });
-
-    gsap.from('.cta-content p', {
-        scrollTrigger: {
-            trigger: '.cta-section',
-            start: 'top 70%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 1,
-        y: 30,
-        opacity: 0,
-        ease: 'power3.out',
-        delay: 0.2
-    });
-
-    gsap.from('.cta-buttons .btn', {
-        scrollTrigger: {
-            trigger: '.cta-section',
-            start: 'top 70%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.8,
-        y: 30,
-        opacity: 0,
-        stagger: 0.2,
-        ease: 'back.out(1.7)',
-        delay: 0.4
-    });
-
-    // Footer Animation
-    gsap.from('.footer-col', {
-        scrollTrigger: {
-            trigger: '.footer',
-            start: 'top 80%',
-            toggleActions: 'play none none reverse'
-        },
-        duration: 0.8,
-        y: 50,
-        opacity: 0,
-        stagger: 0.15,
-        ease: 'power3.out'
-    });
 });
 
 mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touch smoothness
@@ -433,12 +379,13 @@ mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touc
         }, '-=0.1');
     });
 
-    // CTA Section (no reverse)
+    // CTA Section (mobile - no reverse, with debug)
     gsap.from('.cta-content h2', {
         scrollTrigger: {
             trigger: '.cta-section',
-            start: 'top 70%',
-            toggleActions: 'play none none none'
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true
         },
         duration: 0.8,
         y: 30,
@@ -449,8 +396,9 @@ mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touc
     gsap.from('.cta-content p', {
         scrollTrigger: {
             trigger: '.cta-section',
-            start: 'top 70%',
-            toggleActions: 'play none none none'
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true
         },
         duration: 0.8,
         y: 20,
@@ -462,13 +410,15 @@ mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touc
     gsap.from('.cta-buttons .btn', {
         scrollTrigger: {
             trigger: '.cta-section',
-            start: 'top 70%',
-        toggleActions: 'play none none none'
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true,
+            onEnter: () => console.log('CTA Buttons Fired!')  // Temp: Check console
         },
         duration: 0.6,
         y: 20,
         opacity: 0,
-        stagger: 0.1,
+        stagger: 0.15,
         ease: 'power2.out',
         delay: 0.2
     });

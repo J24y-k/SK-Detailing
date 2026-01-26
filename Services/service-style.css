@@ -774,6 +774,16 @@ section {
     line-height: 1.8;
 }
 
+.step-icon {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.step-number {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
 /* ===== BUTTONS ===== */
 .btn {
     padding: 16px 40px;
