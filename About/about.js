@@ -724,7 +724,7 @@ if ('IntersectionObserver' in window) {
 
     const images = document.querySelectorAll('img[data-src]');
     images.forEach(img => imageObserver.observe(img));
-}  // ← Just a closing brace, no parenthesis
+}  // ← Just a closing brace, no parenthesis, bit confusing here!
 
 
 // ===== PRELOADER & REFRESH =====
