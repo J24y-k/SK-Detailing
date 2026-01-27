@@ -1,6 +1,12 @@
 // ===== GSAP REGISTRATION =====
 gsap.registerPlugin(ScrollTrigger);
 
+// Global ScrollTrigger config for smoothness
+ScrollTrigger.config({ 
+    limitCallbacks: 1,
+    fastScrollEnd: 200
+});
+
 // ===== NAVIGATION =====
 const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
@@ -64,7 +70,8 @@ gsap.from('.quick-contact-card', {
     y: 80,
     opacity: 0,
     stagger: 0.15,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false
 });
 
 // Quick Contact Card Hover Effect
@@ -98,7 +105,8 @@ gsap.from('.form-header', {
     duration: 1,
     x: -50,
     opacity: 0,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false
 });
 
 gsap.from('.contact-form', {
@@ -111,7 +119,8 @@ gsap.from('.contact-form', {
     x: -50,
     opacity: 0,
     ease: 'power3.out',
-    delay: 0.2
+    delay: 0.2,
+    immediateRender: false
 });
 
 // Form Groups Animation
@@ -126,7 +135,8 @@ gsap.from('.form-group', {
     opacity: 0,
     stagger: 0.08,
     ease: 'power2.out',
-    delay: 0.4
+    delay: 0.4,
+    immediateRender: false
 });
 
 // ===== CONTACT INFO SECTION ANIMATIONS =====
@@ -140,7 +150,8 @@ gsap.from('.info-card', {
     x: 50,
     opacity: 0,
     stagger: 0.2,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false
 });
 
 // Info Items Animation
@@ -155,7 +166,8 @@ document.querySelectorAll('.info-item').forEach((item, i) => {
         x: -30,
         opacity: 0,
         ease: 'power2.out',
-        delay: i * 0.1
+        delay: i * 0.1,
+        immediateRender: false
     });
 });
 
@@ -170,7 +182,8 @@ gsap.from('.faq-item', {
     y: 50,
     opacity: 0,
     stagger: 0.1,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false
 });
 
 // FAQ Accordion Functionality
@@ -178,21 +191,36 @@ const faqItems = document.querySelectorAll('.faq-item');
 
 faqItems.forEach(item => {
     const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
     
     question.addEventListener('click', () => {
         const isActive = item.classList.contains('active');
         
-        // Close all FAQ items
+        // Close all other FAQ items with animation
         faqItems.forEach(faq => {
-            faq.classList.remove('active');
+            if (faq !== item && faq.classList.contains('active')) {
+                faq.classList.remove('active');
+                gsap.to(faq.querySelector('.faq-answer'), {
+                    duration: 0.4,
+                    maxHeight: 0,
+                    ease: 'power2.in'
+                });
+            }
         });
         
-        // Open clicked item if it wasn't active
-        if (!isActive) {
+        // Toggle current item
+        if (isActive) {
+            // Close current
+            item.classList.remove('active');
+            gsap.to(answer, {
+                duration: 0.4,
+                maxHeight: 0,
+                ease: 'power2.in'
+            });
+        } else {
+            // Open current
             item.classList.add('active');
-            
-            // Animate the opening
-            gsap.to(item.querySelector('.faq-answer'), {
+            gsap.to(answer, {
                 duration: 0.4,
                 maxHeight: '500px',
                 ease: 'power2.out'
@@ -211,7 +239,8 @@ gsap.from('.cta-content h2', {
     duration: 1,
     y: 50,
     opacity: 0,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false
 });
 
 gsap.from('.cta-content p', {
@@ -224,7 +253,8 @@ gsap.from('.cta-content p', {
     y: 30,
     opacity: 0,
     ease: 'power3.out',
-    delay: 0.2
+    delay: 0.2,
+    immediateRender: false
 });
 
 gsap.from('.cta-buttons .btn', {
@@ -238,7 +268,8 @@ gsap.from('.cta-buttons .btn', {
     opacity: 0,
     stagger: 0.2,
     ease: 'back.out(1.7)',
-    delay: 0.4
+    delay: 0.4,
+    immediateRender: false
 });
 
 // ===== FOOTER ANIMATION =====
@@ -252,7 +283,8 @@ gsap.from('.footer-col', {
     y: 50,
     opacity: 0,
     stagger: 0.15,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    immediateRender: false
 });
 
 // ===== FORM VALIDATION & SUBMISSION =====
@@ -628,7 +660,8 @@ sections.forEach(section => {
         },
         duration: 0.6,
         opacity: 0,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        immediateRender: false
     });
 });
 

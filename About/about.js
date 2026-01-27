@@ -125,7 +125,8 @@ gsap.from('.highlight-item', {
     x: -80,
     opacity: 0,
     stagger: 0.2,
-    ease: 'back.out(1.7)'
+    ease: 'back.out(1.7)',
+    immediateRender: false
 });
 
 // Story Image Animation
@@ -169,7 +170,8 @@ mmMission.add("(min-width: 769px)", () => {  // Desktop: With reverse
         y: 100,
         opacity: 0,
         stagger: 0.3,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        immediateRender: false
     });
 });
 
@@ -200,38 +202,44 @@ mmValues.add("(min-width: 769px)", () => {  // Desktop: Full timeline with rever
                 trigger: card,
                 start: 'top 85%',
                 toggleActions: 'play none none reverse'
-            }
+            },
+            immediateRender: false
         });
 
         tl.from(card, {
             duration: 0.8,
             y: 80,
             opacity: 0,
-            ease: 'power3.out'
+            ease: 'power3.out',
+            immediateRender: false
         })
         .from(card.querySelector('.value-number'), {
             duration: 0.5,
             scale: 0,
             opacity: 0,
-            ease: 'back.out(1.7)'
+            ease: 'back.out(1.7)',
+            immediateRender: false
         }, '-=0.5')
         .from(card.querySelector('.value-icon'), {
             duration: 0.6,
             scale: 0,
             rotation: -180,
-            ease: 'back.out(1.7)'
+            ease: 'back.out(1.7)',
+            immediateRender: false
         }, '-=0.4')
         .from(card.querySelector('h3'), {
             duration: 0.5,
             y: 20,
             opacity: 0,
-            ease: 'power3.out'
+            ease: 'power3.out',
+            immediateRender: false
         }, '-=0.3')
         .from(card.querySelector('p'), {
             duration: 0.5,
             y: 15,
             opacity: 0,
-            ease: 'power3.out'
+            ease: 'power3.out',
+            immediateRender: false
         }, '-=0.2');
     });
 });
@@ -244,38 +252,44 @@ mmValues.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse
                 start: 'top 85%',
                 toggleActions: 'play none none none',
                 once: true
-            }
+            },
+            immediateRender: false
         });
 
         tl.from(card, {
             duration: 0.6,
             y: 50,
             opacity: 0,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            immediateRender: false
         })
         .from(card.querySelector('.value-number'), {
             duration: 0.4,
             scale: 0,
             opacity: 0,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            immediateRender: false
         }, '-=0.4')
         .from(card.querySelector('.value-icon'), {
             duration: 0.5,
             scale: 0,
             opacity: 0,
-            ease: 'power2.out'  // No rotation for mobile perf
+            ease: 'power2.out',  // No rotation for mobile perf
+            immediateRender: false
         }, '-=0.3')
         .from(card.querySelector('h3'), {
             duration: 0.4,
             y: 15,
             opacity: 0,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            immediateRender: false
         }, '-=0.2')
         .from(card.querySelector('p'), {
             duration: 0.4,
             y: 10,
             opacity: 0,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            immediateRender: false
         }, '-=0.1');
     });
 });
@@ -374,7 +388,7 @@ statNumbers.forEach(stat => {
                 snap: { innerHTML: 1 },
                 ease: 'power1.out',
                 onUpdate: function() {
-                    stat.innerHTML = Math.ceil(stat.innerHTML);
+                    stat.innerHTML = Math.ceil(this.targets()[0].innerHTML) + '';
                 }
             });
         }
@@ -425,7 +439,8 @@ mmTestimonials.add("(min-width: 769px)", () => {  // Desktop: With reverse
         y: 80,
         opacity: 0,
         stagger: 0.2,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        immediateRender: false
     });
 });
 
