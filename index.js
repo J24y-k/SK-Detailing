@@ -379,7 +379,59 @@ mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touc
         }, '-=0.1');
     });
 
-    // CTA Section (mobile - no reverse, with debug)
+    // ===== CTA SECTION (RESPONSIVE) =====
+// TODO: change phone numbers in HTML for CTA buttons back to friend's number (e.g., tel:0711532418 and wa.me/27711532418) once testing is done
+let mmService = gsap.matchMedia();
+
+mmService.add("(min-width: 769px)", () => {
+    // Ensure buttons are visible by default
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
+    gsap.from('.cta-content h2', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 50,
+        opacity: 0,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.cta-content p', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 1,
+        y: 30,
+        opacity: 0,
+        ease: 'power3.out',
+        delay: 0.2
+    });
+
+    gsap.from('.cta-buttons .btn', {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+            onEnter: () => console.log('Desktop CTA Buttons Fired!')
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'back.out(1.7)',
+        delay: 0.4
+    });
+});
+
+mmService.add("(max-width: 768px)", () => {
+    // Ensure buttons are visible by default
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
     gsap.from('.cta-content h2', {
         scrollTrigger: {
             trigger: '.cta-section',
@@ -413,7 +465,7 @@ mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touc
             start: 'top 80%',
             toggleActions: 'play none none none',
             once: true,
-            onEnter: () => console.log('CTA Buttons Fired!')  // Temp: Check console
+            onEnter: () => console.log('Mobile CTA Buttons Fired!')
         },
         duration: 0.6,
         y: 20,
@@ -422,6 +474,7 @@ mm.add("(max-width: 768px)", () => {  // Mobile: Simplified, no reverse for touc
         ease: 'power2.out',
         delay: 0.2
     });
+});
 
     // Footer Animation (no reverse)
     gsap.from('.footer-col', {
