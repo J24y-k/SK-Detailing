@@ -132,129 +132,139 @@ gsap.from('.nav-menu li', {
     delay: 0.4
 });
 
-// ===== SCROLL TRIGGER ANIMATIONS (MOBILE-RESPONSIVE) =====
-let mm = gsap.matchMedia();  // GSAP's responsive powerhouse
-
-mm.add("(min-width: 769px)", () => {  // Desktop: Full animations with reverse
-    // Section Headers
-    gsap.utils.toArray('.section-header').forEach(header => {
-        gsap.from(header, {
-            scrollTrigger: {
-                trigger: header,
-                start: 'top 80%',
-                toggleActions: 'play none none reverse'
-            },
-            duration: 1,
-            y: 50,
-            opacity: 0,
-            ease: 'power3.out'
-        });
+mm.add("(max-width: 768px)", () => {  // Mobile: Optimized batching for smoothness
+    
+    // ===== BATCH SECTION HEADERS (All at once) =====
+    gsap.from('.section-header', {
+        scrollTrigger: {
+            trigger: 'body',
+            start: 'top top',
+            once: true
+        },
+        duration: 0.5,
+        y: 20,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
     });
 
-    // Benefit Cards
-    gsap.utils.toArray('.benefit-card').forEach((card, i) => {
-        gsap.from(card, {
+    // ===== WHY US - BENEFIT CARDS (Batched, super smooth) =====
+    gsap.from('.benefit-card', {
+        scrollTrigger: {
+            trigger: '.why-us',  // Single trigger for all cards
+            start: 'top 80%',
+            once: true
+        },
+        duration: 0.5,
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,  // Shorter stagger
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
+    });
+
+    // ===== SERVICES - SERVICE CARDS (Batched) =====
+    gsap.from('.service-card', {
+        scrollTrigger: {
+            trigger: '.services-preview',  // Single trigger
+            start: 'top 80%',
+            once: true
+        },
+        duration: 0.6,
+        y: 40,
+        opacity: 0,
+        stagger: 0.15,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
+    });
+
+    // ===== SERVICE FEATURES (Batched by parent) =====
+    gsap.utils.toArray('.service-features').forEach(featureList => {
+        gsap.from(featureList.querySelectorAll('li'), {
             scrollTrigger: {
-                trigger: card,
+                trigger: featureList,
                 start: 'top 85%',
-                toggleActions: 'play none none reverse'
+                once: true
             },
-            duration: 0.8,
-            y: 80,
+            duration: 0.3,
+            x: -10,
             opacity: 0,
-            ease: 'power3.out',
-            delay: i * 0.1
-        });
-    });
-
-    // Service Cards
-    gsap.utils.toArray('.service-card').forEach((card, i) => {
-        gsap.from(card, {
-            scrollTrigger: {
-                trigger: card,
-                start: 'top 85%',
-                toggleActions: 'play none none reverse'
-            },
-            duration: 1,
-            y: 100,
-            opacity: 0,
-            ease: 'power3.out',
-            delay: i * 0.2
-        });
-    });
-
-    // Service Features List Items
-    gsap.utils.toArray('.service-features li').forEach((item, i) => {
-        gsap.from(item, {
-            scrollTrigger: {
-                trigger: item,
-                start: 'top 90%',
-                toggleActions: 'play none none reverse'
-            },
-            duration: 0.6,
-            x: -30,
-            opacity: 0,
+            stagger: 0.02,
             ease: 'power2.out',
-            delay: i * 0.05
+            immediateRender: false,
+            clearProps: 'all'
         });
     });
 
-    // Add-ons Items
-    gsap.utils.toArray('.add-on-item').forEach((item, i) => {
-        gsap.from(item, {
-            scrollTrigger: {
-                trigger: item,
-                start: 'top 90%',
-                toggleActions: 'play none none reverse'
-            },
-            duration: 0.7,
-            x: -50,
-            opacity: 0,
-            ease: 'power3.out',
-            delay: i * 0.1
-        });
+    // ===== ADD-ONS (Batched - single trigger) =====
+    gsap.from('.add-on-item', {
+        scrollTrigger: {
+            trigger: '.add-ons-preview',
+            start: 'top 85%',
+            once: true
+        },
+        duration: 0.4,
+        x: -15,
+        opacity: 0,
+        stagger: 0.08,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
     });
 
-    // Step Cards (with reverse for desktop)
-    gsap.utils.toArray('.step-card').forEach((card, i) => {
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: card,
-                start: 'top 85%',
-                toggleActions: 'play none none reverse'  // Reverse OK on desktop
-            }
-        });
+    // ===== STEP CARDS (Simplified - no rotation) =====
+    gsap.from('.step-card', {
+        scrollTrigger: {
+            trigger: '.how-it-works',
+            start: 'top 80%',
+            once: true
+        },
+        duration: 0.5,
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
+    });
 
-        tl.from(card.querySelector('.step-number'), {
-            duration: 0.5,
-            scale: 0,
-            opacity: 0,
-            ease: 'back.out(1.7)',
-            immediateRender: false
-        })
-        .from(card.querySelector('.step-icon'), {
-            duration: 0.7,
-            scale: 0,
-            rotation: -180,
-            opacity: 0,
-            ease: 'back.out(1.7)',
-            force3D: true,
-            immediateRender: false
-        }, '-=0.2')
-        .from(card.querySelector('h3'), {
-            duration: 0.5,
-            y: 30,
-            opacity: 0,
-            ease: 'power3.out',
-            immediateRender: false
-        }, '-=0.3')
-        .from(card.querySelector('p'), {
-            duration: 0.5,
-            y: 20,
-            opacity: 0,
-            ease: 'power3.out',
-            immediateRender: false
-        }, '-=0.2');
+    // ===== CTA SECTION =====
+    gsap.set('.cta-buttons .btn', { opacity: 1, y: 0 });
+    
+    const ctaElements = ['.cta-content h2', '.cta-content p', '.cta-buttons .btn'];
+    gsap.from(ctaElements.join(', '), {
+        scrollTrigger: {
+            trigger: '.cta-section',
+            start: 'top 80%',
+            once: true
+        },
+        duration: 0.5,
+        y: 20,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
+    });
+
+    // ===== FOOTER =====
+    gsap.from('.footer-col', {
+        scrollTrigger: {
+            trigger: '.footer',
+            start: 'top 85%',
+            once: true
+        },
+        duration: 0.5,
+        y: 20,
+        opacity: 0,
+        stagger: 0.08,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'all'
     });
 });
 

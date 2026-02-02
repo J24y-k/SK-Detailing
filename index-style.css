@@ -900,3 +900,32 @@ section {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* Add will-change for elements that will animate */
+.benefit-card,
+.service-card,
+.step-card,
+.add-on-item {
+    will-change: transform, opacity;
+}
+
+/* Remove will-change after animations complete */
+.benefit-card.animated,
+.service-card.animated,
+.step-card.animated,
+.add-on-item.animated {
+    will-change: auto;
+}
+
+/* Ensure elements are visible on low-power devices */
+@media (max-width: 768px) {
+    .benefit-card,
+    .service-card,
+    .add-on-item,
+    .step-card {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
