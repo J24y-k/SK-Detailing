@@ -1089,3 +1089,21 @@ section {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Added for smooth flow animations */
+.benefit-card,
+.service-card,
+.step-card,
+.value-card,
+.addon-card,
+.testimonial-card,
+.process-step,
+.faq-item,
+.quick-contact-card {
+    will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes */
+.animated {
+    will-change: auto;
+}

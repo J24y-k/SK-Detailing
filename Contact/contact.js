@@ -462,44 +462,20 @@ window.resetForm = function() {
 };
 
 // ===== INPUT FOCUS ANIMATIONS =====
-const formInputs = document.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
-
-formInputs.forEach(input => {
-    input.addEventListener('focus', function() {
-        gsap.to(this, {
-            duration: 0.3,
-            scale: 1.02,
-            ease: 'power2.out'
-        });
-        
-        // Animate label
-        const label = this.previousElementSibling;
-        if (label && label.tagName === 'LABEL') {
-            gsap.to(label, {
-                duration: 0.3,
-                color: '#D4AF37',
-                ease: 'power2.out'
-            });
-        }
-    });
-    
-    input.addEventListener('blur', function() {
-        gsap.to(this, {
-            duration: 0.3,
-            scale: 1,
-            ease: 'power2.out'
-        });
-        
-        // Reset label
-        const label = this.previousElementSibling;
-        if (label && label.tagName === 'LABEL') {
-            gsap.to(label, {
-                duration: 0.3,
-                color: '#FFFFFF',
-                ease: 'power2.out'
-            });
-        }
-    });
+// Form Groups Animation - Simplified
+gsap.from('.form-group', {
+    scrollTrigger: {
+        trigger: '.contact-form',
+        start: 'top 80%',
+        once: true  // Only once
+    },
+    duration: 0.4,
+    y: 20,
+    opacity: 0,
+    stagger: 0.05,  // Tighter stagger
+    ease: 'power2.out',
+    immediateRender: false,
+    clearProps: 'all'
 });
 
 // ===== PARALLAX EFFECTS =====
@@ -711,3 +687,55 @@ gsap.to('.form-note i', {
 // ===== CONSOLE GREETING =====
 console.log('%c SK Detailing - Contact Us ', 'background: #D4AF37; color: #0A0A0A; font-size: 20px; font-weight: bold; padding: 10px;');
 console.log('%c Book Your Service Today ', 'background: #0A0A0A; color: #D4AF37; font-size: 14px; padding: 5px;');
+
+// ===== PERFORMANCE OPTIMIZATIONS =====
+// Reduce motion for users who prefer it
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.globalTimeline.timeScale(10); // Instant animations
+    ScrollTrigger.config({ limitCallbacks: true });
+}
+
+// Kill all ScrollTriggers on page hide (back/forward cache)
+window.addEventListener('pagehide', () => {
+    ScrollTrigger.getAll().forEach(st => st.kill());
+});
+
+// Refresh on visibility change
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        ScrollTrigger.refresh();
+    }
+});
+
+// Throttle scroll for smoothness
+let scrollTimeout;
+window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        ScrollTrigger.refresh(true);
+    }, 100);
+}, { passive: true });
+
+// Add after ScrollTrigger config
+const isLowPowerDevice = /Android.*Chrome\/[.0-9]*/.test(navigator.userAgent) || 
+                         navigator.hardwareConcurrency <= 4;
+
+if (isLowPowerDevice) {
+    // Use simpler Intersection Observer instead
+    const fadeInObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                fadeInObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.benefit-card, .service-card, .value-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        fadeInObserver.observe(el);
+    });
+}

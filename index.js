@@ -656,3 +656,55 @@ window.addEventListener('load', () => {
 // ===== CONSOLE GREETING =====
 console.log('%c SK Detailing ', 'background: #D4AF37; color: #0A0A0A; font-size: 20px; font-weight: bold; padding: 10px;');
 console.log('%c Premium Mobile Car Detailing ', 'background: #0A0A0A; color: #D4AF37; font-size: 14px; padding: 5px;');
+
+// ===== PERFORMANCE OPTIMIZATIONS =====
+// Reduce motion for users who prefer it
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.globalTimeline.timeScale(10); // Instant animations
+    ScrollTrigger.config({ limitCallbacks: true });
+}
+
+// Kill all ScrollTriggers on page hide (back/forward cache)
+window.addEventListener('pagehide', () => {
+    ScrollTrigger.getAll().forEach(st => st.kill());
+});
+
+// Refresh on visibility change
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        ScrollTrigger.refresh();
+    }
+});
+
+// Throttle scroll for smoothness
+let scrollTimeout;
+window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        ScrollTrigger.refresh(true);
+    }, 100);
+}, { passive: true });
+
+// Add after ScrollTrigger config
+const isLowPowerDevice = /Android.*Chrome\/[.0-9]*/.test(navigator.userAgent) || 
+                         navigator.hardwareConcurrency <= 4;
+
+if (isLowPowerDevice) {
+    // Use simpler Intersection Observer instead
+    const fadeInObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                fadeInObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.benefit-card, .service-card, .value-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        fadeInObserver.observe(el);
+    });
+}
